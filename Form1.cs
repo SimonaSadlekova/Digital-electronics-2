@@ -12,8 +12,10 @@ using System.IO.Ports;
 namespace Receive_Show_Save_Data
 {
     public partial class Form1 : Form
-    {  
-        public Form1()
+    {                 
+            public delegate void DataReceivedEvent(string in_data);
+            
+            public Form1()
         {
             InitializeComponent();
         }
@@ -44,7 +46,7 @@ namespace Receive_Show_Save_Data
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Message", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, "Error");
             }
 
         }
@@ -60,21 +62,28 @@ namespace Receive_Show_Save_Data
             {
                 tbValue.Text = "";
             }
-            catch (Exception ex)
+            catch (Exception ex1)
             {
-                MessageBox.Show(ex.Message,"Error");
+                MessageBox.Show(ex1.Message,"Error");
             }
 
 
 
         }
-
+       
         private void SerialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            string in_data_voltage = serialPort1.ReadLine();
-            string in_data_current = serialPort1.ReadLine();
-            string in_data = in_data_voltage + ";" + in_data_current;
-            tbValue.Text = in_data;
+            try
+            {
+                string in_data = serialPort1.ReadLine();
+                tbValue.Text = in_data;
+            }
+            catch (Exception ex2)
+            {
+
+                MessageBox.Show(ex2.Message, "Error");
+                serialPort1.Close();
+            }
         }
 
         private void btnStop_Click(object sender, EventArgs e)
@@ -83,9 +92,9 @@ namespace Receive_Show_Save_Data
 
                 serialPort1.Close();
             }
-            catch (Exception ex2)
+            catch (Exception ex3)
             {
-                MessageBox.Show(ex2.Message, "Error");
+                MessageBox.Show(ex3.Message, "Error");
             }
 
 
@@ -101,11 +110,26 @@ namespace Receive_Show_Save_Data
                 MessageBox.Show("Your data has been saved to" + pathFile, "Save file.");
             }
 
-            catch (Exception ex3)
+            catch (Exception ex4)
             {
-                MessageBox.Show(ex3.Message, "Error");
+                MessageBox.Show(ex4.Message, "Error");
             }
 
+        }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            btnOpen.Enabled = true;
+            btnClose.Enabled = false;
+            try
+
+            {
+                serialPort1.Close();
+            }
+            catch (Exception ex5)
+            {
+                MessageBox.Show(ex5.Message, "Error");
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -113,6 +137,5 @@ namespace Receive_Show_Save_Data
             if (serialPort1.IsOpen)
                 serialPort1.Close();
         }
-    }
     }
 }
